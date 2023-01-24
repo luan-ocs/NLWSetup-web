@@ -1,6 +1,8 @@
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { Check } from "phosphor-react";
 import { FormEvent, useState } from "react";
+import { api } from "../lib/axios";
+import * as Dialog from "@radix-ui/react-dialog";
 
 const availableWeekDays = [
   "Domingo",
@@ -16,15 +18,23 @@ export function NewHabitForm() {
   const [title, setTitle] = useState("");
   const [weekDays, setWeekDays] = useState<number[]>([]);
 
-  function createNewHabit(event: FormEvent) {
+  async function createNewHabit(event: FormEvent) {
     event.preventDefault();
+
+    console.log(weekDays);
+    console.log(title);
 
     if (!title || weekDays.length == 0) {
       return;
     }
 
-    console.log(title);
-    console.log(weekDays);
+    await api.post("habits", {
+      title,
+      WeekDays: weekDays,
+    });
+
+    setTitle("");
+    setWeekDays([]);
   }
 
   function handleToggleWeekDay(index: number) {
@@ -73,13 +83,15 @@ export function NewHabitForm() {
         ))}
       </div>
 
-      <button
-        type="submit"
-        className="mt-6 flex rounded-lg p-4 items-center gap-3 font-semibold bg-green-600 hover:bg-green-500"
-      >
-        <Check size={20} weight="bold" />
-        Confirmar
-      </button>
+      <Dialog.Close asChild>
+        <button
+          type="submit"
+          className="mt-6 flex rounded-lg p-4 items-center gap-3 font-semibold bg-green-600 hover:bg-green-500"
+        >
+          <Check size={20} weight="bold" />
+          Confirmar
+        </button>
+      </Dialog.Close>
     </form>
   );
 }
